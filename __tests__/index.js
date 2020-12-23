@@ -7,8 +7,10 @@ describe('prevvy', () => {
   xit('should throw if not receiving params', () => {
 
   })
-  xit('should generate an image faster than ffmpeg-generate-video-preview')
-  it('should be a good boy', async () => {
+  xit('should generate an image faster than ffmpeg-generate-video-preview', () => {
+
+  })
+  it('should be a good boy', () => {
     const opts = {
       input: testVideoPath,
       output: testImagePath,
@@ -16,6 +18,6 @@ describe('prevvy', () => {
       rows: 3,
       width: 256
     }
-    await prevvy(opts)
+    return prevvy(opts)
   })
 });

@@ -1,3 +1,6 @@
+__tests__/*.mp4
+__tests__/*.jpg
+tmp
 # Logs
 logs
 *.log
