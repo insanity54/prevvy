@@ -1,9 +1,7 @@
 version: 2.1
-orbs:
-  node: circleci/node@3.0.0
 
 jobs:
-  build:
+  run_tests:
     docker:
       - image: 'cimg/node:14.14.0'
     steps:
@@ -24,5 +22,4 @@ jobs:
 workflows:
   node-tests:
     jobs:
-      - build
-      - node/test
+      - run_tests
