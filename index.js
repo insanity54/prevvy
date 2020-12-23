@@ -64,17 +64,23 @@ class Prevvy {
 
     // combine images together to make tile
     let inputFiles = [];
-    let map = [];
+    let streams = [];
     let layout = [];
     for (var i=0; i<this.tileCount; i++) {
       inputFiles.push(`-i ${this.tmpDir}/prevvy_intermediate${i}.png `);
-      map.push(`[${i}:v]`);
+      streams.push(`[${i}:v]`);
       layout.push(this.makeLayout(i));
     }
 
 
 
-    return execa.command(`/usr/bin/ffmpeg -y ${inputFiles.join(' ')}-filter_complex ${map.join('')}xstack=inputs=${this.tileCount}:layout=${layout.join('|')}[v] -map [v] ${this.output}`);
+    return execa.command(`/usr/bin/ffmpeg -y `+
+      `${inputFiles.join(' ')}`+
+      `-filter_complex `+
+      `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layout.join('|')}[v];`+
+      `[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`+
+      ` -map [scaled] `+
+      `${this.output}`);
     // /usr/bin/ffmpeg -y -i ./tmp/intermediate0.png -i ./tmp/intermediate1.png -i ./tmp/intermediate2.png -i ./tmp/intermediate3.png -i ./tmp/intermediate4.png -i ./tmp/intermediate5.png -i ./tmp/intermediate6.png -i ./tmp/intermediate7.png -i ./tmp/intermediate8.png -i ./tmp/intermediate8.png -filter_complex "[0:v][1:v][2:v][3:v][4:v][5:v][6:v][7:v][8:v]xstack=inputs=9:layout=0_0|0_h0|0_h0+h1|w0_0|w0_h0|w0_h0+h1|w0+w3_0|w0+w3_h0|w0+w3_h0+h1[v]" -map [v] output.png
     // return image
   }
