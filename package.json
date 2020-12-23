@@ -1,0 +1,33 @@
+{
+  "name": "prevvy",
+  "version": "1.0.0",
+  "description": "Create a tiled video preview image using ffmpeg... FAST!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insanity54/prevvy.git"
+  },
+  "author": "Chris Grimmett <chris@grimtech.net>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/insanity54/prevvy/issues"
+  },
+  "homepage": "https://github.com/insanity54/prevvy#readme",
+  "keywords": [
+    "ffmpeg",
+    "preview",
+    "screenshots",
+    "snapshots",
+    "tile",
+    "generate"
+  ],
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "execa": "^5.0.0",
+    "ffmpeg-probe": "^1.0.6",
+    "luxon": "^1.25.0"
+  }
+}
