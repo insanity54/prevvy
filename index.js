@@ -47,9 +47,9 @@ class Prevvy {
 
   async ffmpegSeekP (timestamp, intermediateOutput) {
     return new Promise((resolve, reject) => {
-      ffmpeg(this.input)
-        .addOption('-y')
+      ffmpeg()
         .addOption('-ss', timestamp)
+        .addInput(this.input)
         .addOption('-frames:v', '1')
         .save(intermediateOutput)
         .on('end', function() {
@@ -96,7 +96,6 @@ class Prevvy {
     // get the length of the video
     const info = await this.ffprobeP(this.input);
     const { duration, duration_ts } = info.streams[0];
-    console.log(`duration (seconds) is ${duration} and duration_ts (frames) is ${duration_ts} tilecount is ${this.tileCount}`);
     const durationMs = duration * 1000;
 
     // use ffmpeg to get equidistant snapshots
@@ -109,8 +108,9 @@ class Prevvy {
       framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
     }
 
-
+    debug(`waiting for results of framegrabs`)
     let result = await Promise.all(framePromises);
+    debug(result)
 
     // combine images together to make tile
     let inputFiles = [];
@@ -121,8 +121,9 @@ class Prevvy {
       streams.push(`[${i}:v]`);
       layouts.push(this.makeLayout(i));
     }
-
+    debug(`combining frames`)
     await this.ffmpegCombineP(inputFiles, streams, layouts);
+    debug(`finished combining frames`)
 
     return {
       output: this.output
