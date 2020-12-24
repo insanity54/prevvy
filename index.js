@@ -56,7 +56,7 @@ class Prevvy {
     for (var i=0; i<this.tileCount; i++) {
       const timestamp = Duration.fromMillis(i*msSlice).toFormat('h:m:s');
       const intermediateOutput = path.join(this.tmpDir, `prevvy_intermediate${i}.png`);
-      framePromises.push(execa.command(`/usr/bin/ffmpeg -y -ss ${timestamp} -i ${this.input} -frames:v 1 ${intermediateOutput}`));
+      framePromises.push(execa.command(`/usr/bin/ffmpeg -y -ss ${timestamp} -i "${this.input}" -frames:v 1 "${intermediateOutput}"`));
     }
 
 
