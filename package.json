@@ -27,7 +27,6 @@
   ],
   "dependencies": {
     "bluebird": "^3.7.2",
-    "execa": "^5.0.0",
     "ffmpeg-probe": "^1.0.6",
     "luxon": "^1.25.0"
   },

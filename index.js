@@ -1,5 +1,5 @@
 const execa = require('execa');
-const probe = require('ffmpeg-probe');
+const ffmpeg = require('fluent-ffmpeg');
 const { DateTime, Duration } = require('luxon');
 const Promise = require('bluebird');
 const os = require('os');
@@ -45,18 +45,67 @@ class Prevvy {
     return `${colSide.join('+')}_${rowSide.join('+')}`;
   }
 
+
+  async ffmpegSeekP (timestamp, intermediateOutput) {
+    return new Promise((resolve, reject) => {
+      ffmpeg(this.input)
+        .addOption('-y')
+        .addOption('-ss', timestamp)
+        .addOption('-frames:v', '1')
+        .save(intermediateOutput)
+        .on('end', function() {
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        })
+        .on('error', function(e) {
+          reject(e);
+        });
+    })
+  }
+
+  async ffmpegCombineP (inputFiles, streams, layouts) {
+    return new Promise((resolve, reject) => {
+      const command = ffmpeg();
+      inputFiles.forEach((inputFile) => {
+        command.input(inputFile);
+      })
+      command
+        .addOption('-y')
+        .addOption('-filter_complex', `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layouts.join('|')}[v];[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`)
+        .addOption('-map', '[scaled]')
+        .save(this.output)
+        .on('end', function() {
+          resolve();
+        })
+        .on('error', function(e) {
+          reject(e);
+        });
+    })
+  }
+
+  async ffprobeP (input) {
+    return new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(input, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+  }
+
   async generate () {
     // get the length of the video
-    const info = await probe(this.input);
+    const info = await this.ffprobeP(this.input);
+    const duration = info.streams[0].duration;
 
     // use ffmpeg to get equidistant snapshots
-    const msSlice = parseInt(info.duration/this.tileCount);
+    const msSlice = parseInt(duration/this.tileCount);
 
     let framePromises = [];
     for (var i=0; i<this.tileCount; i++) {
       const timestamp = Duration.fromMillis(i*msSlice).toFormat('h:m:s');
       const intermediateOutput = path.join(this.tmpDir, `prevvy_intermediate${i}.png`);
-      framePromises.push(execa.command(`/usr/bin/ffmpeg -y -ss ${timestamp} -i "${this.input}" -frames:v 1 "${intermediateOutput}"`));
+      framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
     }
 
 
@@ -65,24 +114,21 @@ class Prevvy {
     // combine images together to make tile
     let inputFiles = [];
     let streams = [];
-    let layout = [];
+    let layouts = [];
     for (var i=0; i<this.tileCount; i++) {
-      inputFiles.push(`-i ${this.tmpDir}/prevvy_intermediate${i}.png `);
+      inputFiles.push(`${this.tmpDir}/prevvy_intermediate${i}.png`);
       streams.push(`[${i}:v]`);
-      layout.push(this.makeLayout(i));
+      layouts.push(this.makeLayout(i));
+    }
+
+    await this.ffmpegCombineP(inputFiles, streams, layouts);
+
+    return {
+      output: this.output
     }
 
 
-
-    return execa.command(`/usr/bin/ffmpeg -y `+
-      `${inputFiles.join(' ')}`+
-      `-filter_complex `+
-      `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layout.join('|')}[v];`+
-      `[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`+
-      ` -map [scaled] `+
-      `${this.output}`);
     // /usr/bin/ffmpeg -y -i ./tmp/intermediate0.png -i ./tmp/intermediate1.png -i ./tmp/intermediate2.png -i ./tmp/intermediate3.png -i ./tmp/intermediate4.png -i ./tmp/intermediate5.png -i ./tmp/intermediate6.png -i ./tmp/intermediate7.png -i ./tmp/intermediate8.png -i ./tmp/intermediate8.png -filter_complex "[0:v][1:v][2:v][3:v][4:v][5:v][6:v][7:v][8:v]xstack=inputs=9:layout=0_0|0_h0|0_h0+h1|w0_0|w0_h0|w0_h0+h1|w0+w3_0|w0+w3_h0|w0+w3_h0+h1[v]" -map [v] output.png
-    // return image
   }
 }
 
