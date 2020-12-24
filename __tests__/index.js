@@ -50,7 +50,7 @@ const assertTestVideoExistence = () => {
 
 
 describe('prevvy', () => {
-  jest.setTimeout(1000*60*20);
+  jest.setTimeout(10000);
   beforeAll(() => {
     return assertTestVideoExistence();
   });
