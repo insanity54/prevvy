@@ -14,7 +14,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - install:
+      - run:
           name: Install Dependencies
           command: yarn install --immutable
       - save_cache:
