@@ -1,26 +1,83 @@
 const Prevvy = require('../index');
+const generatePreview = require('ffmpeg-generate-video-preview');
 const path = require('path');
-const testVideoPath = path.join(__dirname, 'testVideo.mp4');
+const fs = require('fs');
+const axios = require('axios');
+
+const testVideoPath = path.join(__dirname, 'BigBuckBunny_320x180.mp4');
+const testImageDir = __dirname;
 const testImage3x3Path = path.join(__dirname, 'testImage3x3.png');
 const testImage6x3Path = path.join(__dirname, 'testImage6x3.png');
+const movieUrl = 'https://ipfs.io/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse/video.mp4';
+const opts = (id) => {
+  return {
+    input: testVideoPath,
+    output: path.join(testImageDir, `testImage_${id}.png`),
+    width: 256,
+    cols: 3,
+    rows: 3
+  };
+};
 
-const opts1 = {
-  input: testVideoPath,
-  output: testImage3x3Path,
-  width: 256,
-  cols: 3,
-  rows: 3
+
+const downloadTestVideo = () => {
+  console.log(`downloading ${movieUrl}`)
+  return axios.get(movieUrl, {
+    method: 'GET',
+    responseType: 'stream'
+  }).then((res) => {
+    return new Promise((resolve, reject) => {
+      let writeStream = fs.createWriteStream(testVideoPath);
+      res.data.pipe(writeStream);
+      res.data.on('end', () => {
+        resolve(testVideoPath)
+      })
+    })
+  })
 }
+
+const assertTestVideoExistence = () => {
+  return new Promise((resolve, reject) => {
+    fs.stat(testVideoPath, (err, stats) => {
+      if (typeof stats === 'undefined') {
+        return downloadTestVideo()
+      } else {
+        resolve()
+      }
+    });
+  })
+}
+
 
 describe('prevvy', () => {
   jest.setTimeout(10000);
+  describe('perf', () => {
+    beforeAll(() => {
+      return assertTestVideoExistence();
+    });
+    xit('should generate an image faster than ffmpeg-generate-video-preview', async () => {
+      // this fails on videos of lower file size, but I think it will succeed on videos that are several GB in size.
+      // There are complications getting a large filesize video to test (my internet sucks)
+      jest.setTimeout(1000*60*20);
+
+      let prevvyStartTime = new Date().valueOf();
+      let p = new Prevvy(opts('prevvy'));
+      await p.generate();
+      let prevvyEndTime = new Date().valueOf();
+      let prevvyElapsedTime = prevvyEndTime-prevvyStartTime;
+      console.log(`prevvy took ${prevvyElapsedTime}ms`);
+
+      let fgvpStartTime = new Date().valueOf();
+      await generatePreview(opts('fgvp'));
+      let fgvpEndTime = new Date().valueOf();
+      let fgvpElapsedTime = fgvpEndTime-fgvpStartTime;
+      console.log(`fgvp took ${fgvpElapsedTime}ms`);
+
+      expect(prevvyElapsedTime).toBeLessThan(fgvpElapsedTime);
+
+    })
+  })
   describe('generate', () => {
-    xit('should throw if not receiving params', () => {
-
-    })
-    xit('should generate an image faster than ffmpeg-generate-video-preview', () => {
-
-    })
     test('should make a 3x3 preview image', () => {
       const opts = {
         input: testVideoPath,
@@ -47,7 +104,7 @@ describe('prevvy', () => {
 
   describe('makeLayout', () => {
     beforeEach(() => {
-      p = new Prevvy(opts1);
+      p = new Prevvy(opts('layout'));
     })
     test('3x3 grid i 0', () => {
       expect(p.makeLayout(0)).toBe('0_0');

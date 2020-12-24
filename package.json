@@ -31,7 +31,10 @@
     "luxon": "^1.25.0"
   },
   "devDependencies": {
+    "axios": "^0.21.1",
     "ffmpeg-generate-video-preview": "^1.0.3",
     "jest": "^26.6.3"
-  }
+  },
+  "jest": { "testEnvironment": "node" }
+  
 }
