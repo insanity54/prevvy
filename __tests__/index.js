@@ -40,7 +40,7 @@ const assertTestVideoExistence = () => {
   return new Promise((resolve, reject) => {
     fs.stat(testVideoPath, (err, stats) => {
       if (typeof stats === 'undefined') {
-        return downloadTestVideo()
+        resolve(downloadTestVideo())
       } else {
         resolve()
       }
