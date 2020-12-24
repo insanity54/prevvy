@@ -50,7 +50,7 @@ const assertTestVideoExistence = () => {
 
 
 describe('prevvy', () => {
-  jest.setTimeout(10000);
+  jest.setTimeout(1000*60*20);
   beforeAll(() => {
     return assertTestVideoExistence();
   });
@@ -58,7 +58,6 @@ describe('prevvy', () => {
     xit('should generate an image faster than ffmpeg-generate-video-preview', async () => {
       // this fails on videos of lower file size, but I think it will succeed on videos that are several GB in size.
       // There are complications getting a large filesize video to test (my internet sucks)
-      jest.setTimeout(1000*60*20);
 
       let prevvyStartTime = new Date().valueOf();
       let p = new Prevvy(opts('prevvy'));
