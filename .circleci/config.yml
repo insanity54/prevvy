@@ -1,15 +1,19 @@
 version: 2.1
 
+restore_cache: &restore_cache
+  - run:
+    name: Restore Yarn Package Cache
+    keys:
+      - yarn-packages-{{ checksum "yarn.lock" }}
+
 jobs:
   run_tests:
     docker:
       - image: 'cimg/node:14.14.0'
     steps:
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
-      - run:
+      - checkout
+      - *restore_cache
+      - install:
           name: Install Dependencies
           command: yarn install --immutable
       - save_cache:
@@ -17,6 +21,7 @@ jobs:
           key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+      - test: yarn run test
       - run: node --version
 
 workflows:
