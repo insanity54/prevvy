@@ -15,14 +15,16 @@ ffmpeg -i ./example.mp4 -y -vframes 1 -q:v 2 -vf 'select=not(mod(n\,23744)),scal
 
 ... but for long videos, it is **very** slow. This is because ffmpeg must process every frame in the video, a task that is not well suited for microinstances in datacenters.
 
-This module is designed to accomplish the job of getting a tiled screenshot image FAST, by calling ffmpeg multiple times in parallel, each time using ffmpeg's [Input Seeking](https://trac.ffmpeg.org/wiki/Seeking) feature to seek to a point in the video, take a 1 frame snapshot, before combining all the snapshots together to form a tiled image of snapshots.
+This module is designed to accomplish the job of getting a tiled screenshot image FAST, by calling ffmpeg multiple times in parallel, each time using ffmpeg's [Input Seeking](https://trac.ffmpeg.org/wiki/Seeking) feature to seek to a point in the video, take a 1 frame snapshot, before combining all the snapshots together (again with ffmpeg) to form a tiled image of snapshots.
+
+## Example Output
 
 ![Image Output Example](https://raw.githubusercontent.com/insanity54/prevvy/main/example-image.png)
 
 ## Caveats
 
   * This project addresses speed for large (several GB) videos only. On small size videos, this module is potentially slower than using FFmpeg's tile filter.
-  * Equidistant frame selection accuracy is not a priority.
+  * Frame selection accuracy is not a priority. In other words, the frames selected to be combined into the output are not going to be the same frames that ffmpeg would have chosen, given the same options.
 
 ## Usage
 
