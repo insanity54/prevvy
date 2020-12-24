@@ -1416,7 +1416,7 @@ ffmpeg-generate-video-preview@^1.0.3:
     rmfr "^2.0.0"
     tempy "^0.2.1"
 
-ffmpeg-probe@^1.0.1, ffmpeg-probe@^1.0.6:
+ffmpeg-probe@^1.0.1:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/ffmpeg-probe/-/ffmpeg-probe-1.0.6.tgz#4dbb127665ef290fb1b3b51cbecca2d8c7c72406"
   integrity sha512-zxH4MYEtrbafVQ5p1doGzHjUmjt3zI4cdKFSNVbBMKy0bTc/KwqYwnGsnQVlyBcXgqBPw2YwGBEWF53MRLh3Sw==
