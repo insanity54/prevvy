@@ -49,7 +49,7 @@ class Prevvy {
     return new Promise((resolve, reject) => {
       ffmpeg()
         .addOption('-ss', timestamp)
-        .addInput(this.input)
+        .addOption('-i', this.input)
         .addOption('-frames:v', '1')
         .save(intermediateOutput)
         .on('end', function() {
@@ -108,9 +108,7 @@ class Prevvy {
       framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
     }
 
-    debug(`waiting for results of framegrabs`)
     let result = await Promise.all(framePromises);
-    debug(result)
 
     // combine images together to make tile
     let inputFiles = [];
@@ -121,9 +119,7 @@ class Prevvy {
       streams.push(`[${i}:v]`);
       layouts.push(this.makeLayout(i));
     }
-    debug(`combining frames`)
     await this.ffmpegCombineP(inputFiles, streams, layouts);
-    debug(`finished combining frames`)
 
     return {
       output: this.output
