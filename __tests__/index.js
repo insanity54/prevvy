@@ -20,29 +20,13 @@ const opts = (id) => {
 };
 
 
-const downloadTestVideo = () => {
-  console.log(`downloading ${movieUrl}`)
-  return axios.get(movieUrl, {
-    method: 'GET',
-    responseType: 'stream'
-  }).then((res) => {
-    return new Promise((resolve, reject) => {
-      let writeStream = fs.createWriteStream(testVideoPath);
-      res.data.pipe(writeStream);
-      res.data.on('end', () => {
-        resolve(testVideoPath)
-      })
-    })
-  })
-}
-
 const assertTestVideoExistence = () => {
   return new Promise((resolve, reject) => {
     fs.stat(testVideoPath, (err, stats) => {
       if (typeof stats === 'undefined') {
-        resolve(downloadTestVideo())
+        reject("The test videos don\'t exist. Please run 'yarn run assets' to fetch them.");
       } else {
-        resolve()
+        resolve();
       }
     });
   })
@@ -77,6 +61,15 @@ describe('prevvy', () => {
     })
   })
   describe('generate', () => {
+    test('should cope with a video with spaces and special characters in its name', () => {
+      const opts = {
+        input: path.join(__dirname, 'test vid (spaces).mp4'),
+        output: path.join(__dirname, 'spacesOutput.png'),
+        cols: 3,
+        rows: 3,
+        width: 42
+      }
+    });
     test('should make a 3x3 preview image', () => {
       const opts = {
         input: testVideoPath,
