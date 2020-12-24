@@ -17,5 +17,24 @@ ffmpeg -i ./example.mp4 -y -vframes 1 -q:v 2 -vf 'select=not(mod(n\,23744)),scal
 
 This module is designed to accomplish the job of getting a tiled screenshot image FAST, by calling ffmpeg multiple times in parallel, each time using ffmpeg's [Input Seeking](https://trac.ffmpeg.org/wiki/Seeking) feature to seek to a point in the video, take a 1 frame snapshot, before combining all the snapshots together to form a tiled image of snapshots.
 
+![Image Output Example](https://raw.githubusercontent.com/insanity54/prevvy/main/example-image.png)
+
+## Caveats
+
+  * This project addresses speed for large (several GB) videos only. On small size videos, this module is potentially slower than using FFmpeg's tile filter.
+  * Equidistant frame selection accuracy is not a priority.
 
 ## Usage
+
+```
+let opts = {
+  input: testVideoPath,
+  output: testImagePath,
+  width: 128,
+  cols: 6,
+  rows: 3
+};
+
+let p = new Prevvy(opts);
+await p.generate();
+```

@@ -95,7 +95,7 @@ describe('prevvy', () => {
         output: testImage6x3Path,
         cols: 6,
         rows: 3,
-        width: 256
+        width: 128
       }
       let p = new Prevvy(opts);
       return p.generate();
