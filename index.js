@@ -54,7 +54,7 @@ class Prevvy {
         .save(intermediateOutput)
         .on('end', function() {
           setTimeout(() => {
-            resolve();
+            resolve(intermediateOutput);
           }, 1000);
         })
         .on('error', function(e) {
@@ -95,10 +95,12 @@ class Prevvy {
   async generate () {
     // get the length of the video
     const info = await this.ffprobeP(this.input);
-    const duration = info.streams[0].duration;
+    const { duration, duration_ts } = info.streams[0];
+    console.log(`duration (seconds) is ${duration} and duration_ts (frames) is ${duration_ts} tilecount is ${this.tileCount}`);
+    const durationMs = duration * 1000;
 
     // use ffmpeg to get equidistant snapshots
-    const msSlice = parseInt(duration/this.tileCount);
+    const msSlice = parseInt(durationMs/this.tileCount);
 
     let framePromises = [];
     for (var i=0; i<this.tileCount; i++) {
