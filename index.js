@@ -1,4 +1,3 @@
-const execa = require('execa');
 const ffmpeg = require('fluent-ffmpeg');
 const { DateTime, Duration } = require('luxon');
 const Promise = require('bluebird');
