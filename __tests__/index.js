@@ -2,7 +2,6 @@ const Prevvy = require('../index');
 const generatePreview = require('ffmpeg-generate-video-preview');
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
 
 const testVideoPath = path.join(__dirname, 'video.mp4');
 const testImageDir = __dirname;
