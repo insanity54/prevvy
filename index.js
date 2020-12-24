@@ -8,7 +8,7 @@ const path = require('path');
 
 class Prevvy {
   constructor(opts) {
-    this.tmpDir = path.join(__dirname, 'tmp'); // @todo change to os.tmpdir()
+    this.tmpDir = os.tmpdir();
     this.input = opts.input;
     this.output = opts.output;
     this.cols = opts.cols;
