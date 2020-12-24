@@ -1,10 +1,11 @@
 version: 2.1
 
-restore_cache: &restore_cache
-  - run:
-    name: Restore Yarn Package Cache
-    keys:
-      - yarn-packages-{{ checksum "yarn.lock" }}
+aliases:
+  - &restore_cache
+    restore_cache:
+      name: Restore Yarn Package Cache
+      keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
 
 jobs:
   run_tests:
