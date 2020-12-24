@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 
-const testVideoPath = path.join(__dirname, 'BigBuckBunny_320x180.mp4');
+const testVideoPath = path.join(__dirname, 'video.mp4');
 const testImageDir = __dirname;
 const testImage3x3Path = path.join(__dirname, 'testImage3x3.png');
 const testImage6x3Path = path.join(__dirname, 'testImage6x3.png');
@@ -51,10 +51,10 @@ const assertTestVideoExistence = () => {
 
 describe('prevvy', () => {
   jest.setTimeout(10000);
+  beforeAll(() => {
+    return assertTestVideoExistence();
+  });
   describe('perf', () => {
-    beforeAll(() => {
-      return assertTestVideoExistence();
-    });
     xit('should generate an image faster than ffmpeg-generate-video-preview', async () => {
       // this fails on videos of lower file size, but I think it will succeed on videos that are several GB in size.
       // There are complications getting a large filesize video to test (my internet sucks)
