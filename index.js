@@ -3,7 +3,7 @@ const { DateTime, Duration } = require('luxon');
 const Promise = require('bluebird');
 const os = require('os');
 const path = require('path');
-
+const debug = require('debug')('prevvy');
 
 class Prevvy {
   constructor(opts) {
@@ -52,6 +52,7 @@ class Prevvy {
         .addOption('-i', this.input)
         .addOption('-frames:v', '1')
         .save(intermediateOutput)
+        .on('start', (cmd) => debug(`Spawned ffmpeg with command ${cmd}`))
         .on('end', function() {
           setTimeout(() => {
             resolve(intermediateOutput);
