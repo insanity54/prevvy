@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const os = require('os');
 const path = require('path');
 const debug = require('debug')('prevvy');
+const execa = require('execa');
 
 class Prevvy {
   constructor(opts) {
@@ -93,11 +94,18 @@ class Prevvy {
     });
   }
 
+  async getVideoDurationInSeconds (videoFilePath) {
+    const { stdout } = await execa('ffprobe', ['-v', 'error', '-show_format', '-show_streams', videoFilePath]);
+    const matched = stdout.match(/duration="?(\d*\.\d*)"?/)
+    if (matched && matched[1]) return parseFloat(matched[1])
+  }
+
   async generate () {
     // get the length of the video
-    const info = await this.ffprobeP(this.input);
-    const { duration, duration_ts } = info.streams[0];
-    const durationMs = duration * 1000;
+    const durationS = await this.getVideoDurationInSeconds(this.input);
+
+    const durationMs = durationS * 1000;
+    debug(`durationMs: ${durationMs}, durationS: ${durationS}`)
 
     // use ffmpeg to get equidistant snapshots
     const msSlice = parseInt(durationMs/this.tileCount);
