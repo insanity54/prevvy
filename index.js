@@ -56,7 +56,7 @@ class Prevvy {
         .on('end', function(idk) {
           setTimeout(() => {
             resolve(intermediateOutput);
-          }, 1000);
+          }, (/^http/.test(this.input)) ? 3000 : 1000); // throttle for http
         })
         .on('error', function(e) {
           debug(e);
