@@ -67,11 +67,12 @@ describe('prevvy', () => {
         output: path.join(os.tmpdir(), 'test.png'),
         cols: 3,
         rows: 3,
-        width: 42
+        width: 42,
+        throttleTimeout: 10000
       }
       let p = new Prevvy(opts);
       return p.generate();
-    }, 60000)
+    }, 120000)
     test('should cope with a video with spaces and special characters in its name', () => {
       const opts = {
         input: path.join(__dirname, 'test vid (spaces).mp4'),

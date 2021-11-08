@@ -15,6 +15,7 @@ class Prevvy {
     this.rows = opts.rows;
     this.width = opts.width;
     this.tileCount = this.rows*this.cols;
+    this.throttleTimeout = opts.throttleTimeout || 1000;
     if (typeof this.input === 'undefined') throw new Error('input is required in options. got undefined.')
     if (typeof this.output === 'undefined') throw new Error('output is required in options. got undefined.')
     if (typeof this.cols === 'undefined') throw new Error('cols is required in options. got undefined.')
@@ -53,10 +54,10 @@ class Prevvy {
         .addOption('-i', this.input)
         .addOption('-frames:v', '1')
         .on('start', (cmd) => { debug(`Spawned ffmpeg with command ${cmd}`) })
-        .on('end', function(idk) {
+        .on('end', () => {
           setTimeout(() => {
             resolve(intermediateOutput);
-          }, (/^http/.test(this.input)) ? 3000 : 1000); // throttle for http
+          }, this.throttleTimeout); // throttle for http.
         })
         .on('error', function(e) {
           debug(e);
