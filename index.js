@@ -60,6 +60,7 @@ class Prevvy {
           }, 1000);
         })
         .on('error', function(e) {
+          debug(e);
           reject(e);
         });
     })
@@ -81,6 +82,7 @@ class Prevvy {
           resolve();
         })
         .on('error', function(e) {
+          debug(e);
           reject(e);
         });
     })
@@ -111,18 +113,21 @@ class Prevvy {
     // use ffmpeg to get equidistant snapshots
     const msSlice = parseInt(durationMs/this.tileCount);
 
-    let framePromises = [];
+    let frameData = [];
     for (var i=0; i<this.tileCount; i++) {
       const timestamp = Duration.fromMillis(i*msSlice).toFormat('h:m:s');
       const intermediateOutput = path.join(this.tmpDir, `prevvy_intermediate${i}.png`);
-      framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
+      //framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
+      frameData.push([timestamp, intermediateOutput]);
     }
 
-    // throttle https requests
-
-    let result;
-    if (/^http/.test(this.input)) result = await Promise.mapSeries(framePromises);
-    else await Promise.all(framePromises);
+    // throttle https requests (concurrency 1)
+    let result = await Promise.map(
+      frameData,
+      (data) => { return this.ffmpegSeekP(data[0], data[1]) },
+      { concurrency: (/^http/.test(this.input)) ? 1 : 64 }
+    )
+    debug(result)
 
     // combine images together to make tile
     let inputFiles = [];
