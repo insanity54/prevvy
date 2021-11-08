@@ -118,7 +118,11 @@ class Prevvy {
       framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
     }
 
-    let result = await Promise.all(framePromises);
+    // throttle https requests
+
+    let result;
+    if (/^http/.test(this.input)) result = await Promise.mapSeries(framePromises);
+    else await Promise.all(framePromises);
 
     // combine images together to make tile
     let inputFiles = [];
