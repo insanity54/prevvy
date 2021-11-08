@@ -76,6 +76,7 @@ class Prevvy {
         .addOption('-filter_complex', `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layouts.join('|')}[v];[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`)
         .addOption('-map', '[scaled]')
         .save(this.output)
+        .on('start', (cmd) => debug(`Spawned ffmpeg with command ${cmd}`))
         .on('end', function() {
           resolve();
         })
