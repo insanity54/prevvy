@@ -52,9 +52,8 @@ class Prevvy {
         .addOption('-ss', timestamp)
         .addOption('-i', this.input)
         .addOption('-frames:v', '1')
-        .save(intermediateOutput)
-        .on('start', (cmd) => debug(`Spawned ffmpeg with command ${cmd}`))
-        .on('end', function() {
+        .on('start', (cmd) => { debug(`Spawned ffmpeg with command ${cmd}`) })
+        .on('end', function(idk) {
           setTimeout(() => {
             resolve(intermediateOutput);
           }, 1000);
@@ -62,7 +61,8 @@ class Prevvy {
         .on('error', function(e) {
           debug(e);
           reject(e);
-        });
+        })
+        .save(intermediateOutput);
     })
   }
 
@@ -76,7 +76,6 @@ class Prevvy {
         .addOption('-y')
         .addOption('-filter_complex', `${streams.join('')}xstack=inputs=${this.tileCount}:layout=${layouts.join('|')}[v];[v]scale=${Math.floor(this.width*this.cols)}:-1[scaled]`)
         .addOption('-map', '[scaled]')
-        .save(this.output)
         .on('start', (cmd) => debug(`Spawned ffmpeg with command ${cmd}`))
         .on('end', function() {
           resolve();
@@ -84,7 +83,8 @@ class Prevvy {
         .on('error', function(e) {
           debug(e);
           reject(e);
-        });
+        })
+        .save(this.output);
     })
   }
 
@@ -117,14 +117,15 @@ class Prevvy {
     for (var i=0; i<this.tileCount; i++) {
       const timestamp = Duration.fromMillis(i*msSlice).toFormat('h:m:s');
       const intermediateOutput = path.join(this.tmpDir, `prevvy_intermediate${i}.png`);
-      //framePromises.push(this.ffmpegSeekP(timestamp, intermediateOutput));
       frameData.push([timestamp, intermediateOutput]);
     }
 
     // throttle https requests (concurrency 1)
     let result = await Promise.map(
       frameData,
-      (data) => { return this.ffmpegSeekP(data[0], data[1]) },
+      (data) => { 
+        return this.ffmpegSeekP(data[0], data[1])
+      },
       { concurrency: (/^http/.test(this.input)) ? 1 : 64 }
     )
     debug(result)
