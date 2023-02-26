@@ -1,6 +1,6 @@
 {
   "name": "prevvy",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Create a tiled video preview image using ffmpeg... FAST!",
   "main": "index.js",
   "scripts": {
@@ -31,10 +31,15 @@
     "luxon": "^1.25.0"
   },
   "devDependencies": {
+    "babel-jest": "^29.4.3",
     "ffmpeg-generate-video-preview": "^1.0.3",
     "jest": "^26.6.3"
   },
   "jest": {
-    "testEnvironment": "node"
-  }
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "type": "module"
 }
