@@ -4,7 +4,7 @@ import Promise from "bluebird";
 import os from "os";
 import path from "path";
 // import * as debug$0 from "debug";
-import execa from "execa";
+import execa from 'execa';
 // const debug = debug$0('prevvy');
 class Prevvy {
     constructor(opts) {

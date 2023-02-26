@@ -107,6 +107,8 @@ describe('prevvy', () => {
         });
     });
     describe('makeLayout', () => {
+        let p;
+        
         beforeEach(() => {
             p = new Prevvy(opts('layout'));
         });
