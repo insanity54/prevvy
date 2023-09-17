@@ -14,7 +14,7 @@ class Prevvy {
         cols,
         rows,
         width,
-        throttleTimeout = 1000,
+        throttleTimeout = 100,
     }) {
         this.tmpDir = os.tmpdir();
         this.input = input;

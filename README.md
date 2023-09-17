@@ -26,7 +26,7 @@ This module is designed to accomplish the job of getting a tiled screenshot imag
   * This project addresses speed for large (several GB) videos only. On small size videos, this module is potentially slower than using FFmpeg's tile filter.
   * Frame selection accuracy is not a priority. In other words, the frames selected to be combined into the output are not going to be the same frames that ffmpeg would have chosen, given the same options.
 
-## Usage
+## API Usage
 
 ```
 let opts = {
@@ -39,4 +39,10 @@ let opts = {
 
 let p = new Prevvy(opts);
 await p.generate();
+```
+
+## CLI Usage
+
+```
+DEBUG=prevvy node ./cli.js generate --input 'https://example.com/my-video.mp4' --output ./my-storyboard.png
 ```
