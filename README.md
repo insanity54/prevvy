@@ -28,17 +28,23 @@ This module is designed to accomplish the job of getting a tiled screenshot imag
 
 ## API Usage
 
-```
-let opts = {
-  input: testVideoPath,
-  output: testImagePath,
-  width: 128,
-  cols: 6,
-  rows: 3
-};
+```js
+  const videoPath = '/tmp/input.mp4'
+  const imagePath = '/tmp/output.png';
+  let opts = {
+    input: videoPath,
+    output: imagePath,
+    width: 128,
+    cols: 6,
+    rows: 3
+  };
 
-let p = new Prevvy(opts);
-await p.generate();
+  let thumb = new Prevvy(opts);
+  const thumb = p.generate();
+  thumb.on('progress', async (data: { percentage: number }) => {
+    await job.updateProgress(data.percentage);
+  });
+  await thumb.generate();
 ```
 
 ## CLI Usage

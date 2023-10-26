@@ -1,13 +1,14 @@
 import ffmpeg from 'fluent-ffmpeg';
-import { DateTime, Duration } from 'luxon';
+import { Duration } from 'luxon';
 import Promise from 'bluebird';
-import os from 'os';
-import path from 'path';
+import os from 'node:os';
+import path from 'node:path';
 import debug$0 from 'debug';
 import execa from 'execa';
-import fs from 'fs';
+import fs from 'node:fs';
+import EventEmitter from 'node:events';
 
-class Prevvy {
+class Prevvy extends EventEmitter {
     constructor({
         input,
         output,
@@ -16,6 +17,7 @@ class Prevvy {
         width,
         throttleTimeout = 100,
     }) {
+        super();
         this.tmpDir = os.tmpdir();
         this.input = input;
         this.output = output;
@@ -27,6 +29,18 @@ class Prevvy {
         this.debug = debug$0('prevvy');
         this.durationCacheFile = `${this.output}.duration`;
     }
+
+
+    /**
+     * 
+     * ffmpegSeekP
+     * 
+     * seeks to a timestamp of a video and returns a single frame
+     * 
+     * @param {*} timestamp 
+     * @param {*} outputFilename 
+     * @returns 
+     */
     async ffmpegSeekP(timestamp, outputFilename) {
         try {
             // Check if the frame already exists on disk
@@ -66,6 +80,8 @@ class Prevvy {
 
 
     async getVideoDurationInSeconds(videoFilePath) {
+        if (!videoFilePath) throw new Error('videoFilePath passed to getVideoDurationInSeconds is undefined');
+
         // Check if the duration is cached
         if (fs.existsSync(this.durationCacheFile)) {
             const cachedDuration = parseFloat(fs.readFileSync(this.durationCacheFile, 'utf8'));
@@ -74,6 +90,7 @@ class Prevvy {
         }
 
         // Fetch and cache the duration
+        this.debug(`> fetch and cache the video duration using ffprobe. videoFilePath=${videoFilePath}`);
         const { stdout } = await execa('ffprobe', ['-v', 'error', '-show_format', '-show_streams', videoFilePath]);
         const matched = stdout.match(/duration="?(\d*\.\d*)"?/);
         if (matched && matched[1]) {
@@ -87,6 +104,8 @@ class Prevvy {
         }
     }
 
+
+    
 
     async generate() {
         try {
@@ -112,16 +131,18 @@ class Prevvy {
             });
 
             this.debug(frameData)
+            
+            const results = [];
+            for (const [index, data] of frameData.entries()) {
+                const x = Math.round((index / frameData.length) * 100); // Calculate the percentage
+                this.debug(`emitting progress percentage ${x} (${index}/${frameData.length})`);
+                this.emit('progress', { percentage: x });
 
-            const concurrency = /^http/.test(this.input) ? 1 : 64
+                const result = await this.ffmpegSeekP(data[0], data[1]);
+                results.push(result);
+            }
 
-            const result = await Promise.map(
-                frameData,
-                async (data) => await this.ffmpegSeekP(data[0], data[1]),
-                { concurrency: concurrency }
-            );
-            this.debug(`Throttle HTTP requests (concurrency ${concurrency})`)
-            this.debug(`Frame generation result: ${result}`);
+
 
             // Combining images together to make a tile
             const inputFiles = frameData.map((data, i) => `${this.tmpDir}/${id}_${i}.png`);
@@ -171,35 +192,16 @@ class Prevvy {
         return `${colSide.join('+')}_${rowSide.join('+')}`;
     }
 
-    // makeLayout(i) {
-    //     // Calculate layout based on column and row
-    //     const currentColumn = i % this.cols;
-    //     const currentRow = Math.floor(i / this.cols);
-      
-    //     let colSide = [];
-    //     let rowSide = [];
-      
-    //     if (currentColumn === 0) {
-    //       colSide.push('0');
-    //     } else {
-    //       for (var j = 0; j < currentColumn; j++) {
-    //         colSide.push(`w${j}`);
-    //       }
-    //     }
-      
-    //     if (currentRow === 0) {
-    //       rowSide.push('0');
-    //     } else {
-    //       for (var j = 0; j < currentRow; j++) {
-    //         rowSide.push(`h${j}`);
-    //       }
-    //     }
-      
-    //     return `${colSide.join('+')}|${rowSide.join('+')}`;
-    //   }
-      
-
-
+    /**
+     * ffmpegCombineP
+     * 
+     * combines the individual frames into a mosaic
+     * 
+     * @param {*} inputFiles 
+     * @param {*} streams 
+     * @param {*} layouts 
+     * @returns 
+     */
     async ffmpegCombineP(inputFiles, streams, layouts) {
         return new Promise((resolve, reject) => {
             const command = ffmpeg();
@@ -218,6 +220,7 @@ class Prevvy {
 
                 .on('start', (cmd) => this.debug(`ffmpegCombineP: ${cmd}`))
                 .on('end', () => {
+                    this.emit('progress', { percentage: 100 });
                     resolve();
                 })
                 .on('error', (e) => {
@@ -227,7 +230,6 @@ class Prevvy {
                 .save(this.output); // Save the combined output
         });
     }
-
 }
 
 export default Prevvy;
