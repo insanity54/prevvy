@@ -1,14 +1,25 @@
 import ffmpeg from 'fluent-ffmpeg';
 import { Duration } from 'luxon';
-import Promise from 'bluebird';
-import os from 'node:os';
-import path from 'node:path';
+// import Promise from 'bluebird';
+import os from 'os';
+import path from 'path';
 import debug$0 from 'debug';
 import execa from 'execa';
-import fs from 'node:fs';
-import EventEmitter from 'node:events';
+import fs from 'fs';
+import EventEmitter from 'events';
 
 class Prevvy extends EventEmitter {
+    private tmpDir: string;
+    private input: string;
+    private output: string;
+    private cols: number;
+    private rows: number;
+    private width: number;
+    private tileCount: number;
+    private throttleTimeout: number;
+    private debug: debug$0.Debugger;
+    private durationCacheFile: string;
+
     constructor({
         input,
         output,
@@ -41,39 +52,35 @@ class Prevvy extends EventEmitter {
      * @param {*} outputFilename 
      * @returns 
      */
-    async ffmpegSeekP(timestamp, outputFilename) {
-        try {
-            // Check if the frame already exists on disk
-            if (fs.existsSync(outputFilename)) {
-                this.debug(`Frame at timestamp ${timestamp} already exists. Skipping frame generation.`);
-                return outputFilename;
-            }
-
-            return new Promise((resolve, reject) => {
-                ffmpeg()
-                    .addOption('-ss', timestamp)
-                    .addOption('-i', this.input)
-                    .addOption('-frames:v', '1')
-                    .on('start', (cmd) => {
-                        this.debug(`ffmpegSeekP spawned ffmpeg: ${cmd}`);
-                    })
-                    .on('end', () => {
-                        this.debug('throttle for HTTP requests.')
-                        setTimeout(() => {
-                            this.debug('throttle complete')
-                            resolve(outputFilename);
-                        }, this.throttleTimeout);
-                    })
-                    .on('error', (e) => {
-                        this.debug(`Error during ffmpegSeekP: ${e.message}`);
-                        reject(e);
-                    })
-                    .save(outputFilename);
-            });
-        } catch (error) {
-            this.debug(`Error in ffmpegSeekP: ${error.message}`);
-            throw error;
+    async ffmpegSeekP(timestamp: string, outputFilename: string): Promise<string> {
+        // Check if the frame already exists on disk
+        if (fs.existsSync(outputFilename)) {
+            this.debug(`Frame at timestamp ${timestamp} already exists. Skipping frame generation.`);
+            return outputFilename;
         }
+
+        return new Promise((resolve, reject) => {
+            ffmpeg()
+                .addOption('-ss', timestamp)
+                .addOption('-i', this.input)
+                .addOption('-frames:v', '1')
+                .on('start', (cmd: string) => {
+                    this.debug(`ffmpegSeekP spawned ffmpeg: ${cmd}`);
+                })
+                .on('end', () => {
+                    this.debug('throttle for HTTP requests.')
+                    setTimeout(() => {
+                        this.debug('throttle complete')
+                        resolve(outputFilename);
+                    }, this.throttleTimeout);
+                })
+                .on('error', (e) => {
+                    this.debug(`Error during ffmpegSeekP: ${e.message}`);
+                    reject(e);
+                })
+                .save(outputFilename);
+        });
+
     }
 
 
@@ -119,7 +126,7 @@ class Prevvy extends EventEmitter {
             this.debug(`Video duration: ${durationS} seconds`);
 
             this.debug('Calculate the slice duration')
-            const msSlice = parseInt((durationS * 1000) / this.tileCount);
+            const msSlice = Math.floor((durationS * 1000) / this.tileCount);
             this.debug(`Slice duration: ${msSlice} ms`);
 
             this.debug('Create frame data')
@@ -202,7 +209,7 @@ class Prevvy extends EventEmitter {
      * @param {*} layouts 
      * @returns 
      */
-    async ffmpegCombineP(inputFiles, streams, layouts) {
+    async ffmpegCombineP(inputFiles, streams, layouts): Promise<void> {
         return new Promise((resolve, reject) => {
             const command = ffmpeg();
 

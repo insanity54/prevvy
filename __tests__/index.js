@@ -1,4 +1,4 @@
-import Prevvy from "../index.js";
+import Prevvy from "../index.ts";
 import * as generatePreview from "ffmpeg-generate-video-preview";
 import path from "path";
 import fs from "fs";
@@ -7,7 +7,7 @@ const testVideoPath = path.join(__dirname, 'video.mp4');
 const testImageDir = __dirname;
 const testImage3x3Path = path.join(__dirname, 'testImage3x3.png');
 const testImage6x3Path = path.join(__dirname, 'testImage6x3.png');
-const movieUrl = 'https://ipfs.io/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse/video.mp4';
+const movieUrl = 'https://ipfs.video/ipfs/QmQWM1qDPasxm5sXAQeVMfmhnECBzyYkLgfK23yPif1Ftx'; // Blender Half full. Source-- https://ipfs.video/
 const opts = (id) => {
     return {
         input: testVideoPath,
@@ -64,7 +64,7 @@ describe('prevvy', () => {
     describe('generate', () => {
         test('http input source', () => {
             const opts = {
-                input: 'https://ipfs.io/ipfs/bafkreifufx6uharnts5wy6smk7mxmlwg7fpzhf5s3n33kydfgr7zqhagme?filename=test-30211016T000000Z.mp4',
+                input: movieUrl,
                 output: path.join(os.tmpdir(), 'test.png'),
                 cols: 3,
                 rows: 3,
