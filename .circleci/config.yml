@@ -3,36 +3,36 @@ version: 2.1
 aliases:
   - &restore_cache
     restore_cache:
-      name: Restore Yarn Package Cache
+      name: Restore pnpm package cache
       keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
 
 jobs:
   run_tests:
     docker:
-      - image: 'cimg/node:14.14.0'
+      - image: 'cimg/node:18'
     steps:
       - checkout
       - *restore_cache
       - run:
           name: Install Dependencies
-          command: yarn install --immutable
+          command: pnpm install --immutable
       - run:
           name: Download test videos
-          command: yarn run assets
+          command: pnpm run assets
       - run:
           name: Install FFmpeg
           command: |
             sudo apt-get -y update
             sudo apt-get -y install ffmpeg
       - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          name: Save pnpm package cache
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
           paths:
-            - ~/.cache/yarn
+            - node_modules
       - run:
           name: Unit tests
-          command: yarn run test
+          command: pnpm run test
       - run: node --version
 
 workflows:
