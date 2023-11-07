@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "assets": "cd __tests__ && wget -O ./video.mp4 https://ipfs.io/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse/video.mp4 && cp ./video.mp4 \"./test vid (spaces).mp4\""
+    "assets": "cd __tests__ && wget -O ./video.mp4 https://ipfs.io/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse/video.mp4 && cp ./video.mp4 \"./test vid (spaces).mp4\"",
+    "build": "tsc --project ./tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,8 @@
     "debug": "^4.3.4",
     "execa": "^0.10.0",
     "fluent-ffmpeg": "^2.1.2",
-    "luxon": "^1.25.0"
+    "luxon": "^1.25.0",
+    "typescript": "^5.2.2"
   },
   "devDependencies": {
     "babel-jest": "^29.4.3",
