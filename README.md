@@ -28,10 +28,11 @@ This module is designed to accomplish the job of getting a tiled screenshot imag
 
 ## API Usage
 
-```js
+```ts
   const videoPath = '/tmp/input.mp4'
   const imagePath = '/tmp/output.png';
-  let opts = {
+
+  let options = {
     input: videoPath,
     output: imagePath,
     width: 128,
@@ -39,12 +40,16 @@ This module is designed to accomplish the job of getting a tiled screenshot imag
     rows: 3
   };
 
-  let thumb = new Prevvy(opts);
-  const thumb = p.generate();
-  thumb.on('progress', async (data: { percentage: number }) => {
+  let prevvy = new Prevvy(options);
+
+  /**
+   * Optional: the prevvy instance extends EventEmitter, emitting progress events.
+   */
+  prevvy.on('progress', async (data: { percentage: number }) => {
     await job.updateProgress(data.percentage);
   });
-  await thumb.generate();
+
+  await prevvy.generate();
 ```
 
 ## CLI Usage
