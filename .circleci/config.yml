@@ -16,7 +16,7 @@ jobs:
       - *restore_cache
       - run:
           name: Install Dependencies
-          command: pnpm install --immutable
+          command: pnpm install
       - run:
           name: Download test videos
           command: pnpm run assets
