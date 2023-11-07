@@ -7,7 +7,7 @@ const testVideoPath = path.join(__dirname, 'video.mp4');
 const testImageDir = __dirname;
 const testImage3x3Path = path.join(__dirname, 'testImage3x3.png');
 const testImage6x3Path = path.join(__dirname, 'testImage6x3.png');
-const movieUrl = 'https://ipfs.video/ipfs/QmQWM1qDPasxm5sXAQeVMfmhnECBzyYkLgfK23yPif1Ftx'; // Blender Half full. Source-- https://ipfs.video/
+const movieUrl = 'https://ipfs.io/ipfs/QmQWM1qDPasxm5sXAQeVMfmhnECBzyYkLgfK23yPif1Ftx'; // Blender Half full. Source-- https://ipfs.video/
 const opts = (id) => {
     return {
         input: testVideoPath,
@@ -21,7 +21,7 @@ const assertTestVideoExistence = () => {
     return new Promise((resolve, reject) => {
         fs.stat(testVideoPath, (err, stats) => {
             if (typeof stats === 'undefined') {
-                reject("The test videos don\'t exist. Please run 'yarn run assets' to fetch them.");
+                reject("The test videos don\'t exist. Please run 'pn run assets' to fetch them.");
             }
             else {
                 resolve();
