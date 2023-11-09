@@ -44,7 +44,8 @@ describe('prevvy', () => {
 
 
 
-  describe('generate', () => {
+  describe('generate', function() {
+    this.timeout(120000);
     it('http input source', async () => {
       const options: IPrevvyOptions = {
         input: movieUrl,
@@ -56,7 +57,7 @@ describe('prevvy', () => {
       };
       let p = new Prevvy(options);
       await p.generate();
-    }).timeout(120000);
+    })
 
     it('should cope with a video with spaces and special characters in its name', () => {
       const options: IPrevvyOptions = {
