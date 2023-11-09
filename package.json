@@ -1,11 +1,11 @@
 {
   "name": "prevvy",
-  "version": "7.4.0",
+  "version": "7.5.0",
   "description": "Create a tiled video preview image using ffmpeg... FAST!",
   "main": "index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "test": "jest",
+    "test": "pnpm mocha ./**/*.spec.ts",
     "assets": "cd __tests__ && wget -O ./video.mp4 https://ipfs.io/ipfs/QmTKZgRNwDNZwHtJSjCp6r5FYefzpULfy37JvMt9DwvXse/video.mp4 && cp ./video.mp4 \"./test vid (spaces).mp4\"",
     "build": "tsc --project ./tsconfig.json"
   },
@@ -28,7 +28,6 @@
     "generate"
   ],
   "dependencies": {
-    "@babel/preset-env": "^7.23.2",
     "@types/debug": "^4.1.11",
     "@types/fluent-ffmpeg": "^2.1.24",
     "@types/luxon": "^3.3.4",
@@ -40,10 +39,17 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.23.2",
     "@babel/preset-typescript": "^7.23.2",
+    "@types/chai": "^4.3.10",
+    "@types/mocha": "^10.0.4",
     "babel-jest": "^29.7.0",
-    "ffmpeg-generate-video-preview": "^1.0.3",
-    "jest": "^26.6.3"
+    "chai": "^4.3.10",
+    "jest": "^26.6.3",
+    "mocha": "^10.2.0",
+    "ts-jest": "^29.1.1",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.1"
   },
   "jest": {
     "testEnvironment": "node",

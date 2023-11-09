@@ -7,7 +7,7 @@ import { execa } from 'execa';
 import fs from 'fs';
 import EventEmitter from 'events';
 
-interface IPrevvyProps {
+export interface IPrevvyOptions {
     input: string;
     output: string;
     cols: number;
@@ -35,7 +35,7 @@ class Prevvy extends EventEmitter {
         rows,
         width,
         throttleTimeout = 100,
-    }: IPrevvyProps) {
+    }: IPrevvyOptions) {
         super();
         this.tmpDir = os.tmpdir();
         this.input = input;
