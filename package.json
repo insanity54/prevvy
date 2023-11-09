@@ -1,6 +1,6 @@
 {
   "name": "prevvy",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "Create a tiled video preview image using ffmpeg... FAST!",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.23.2",
     "@types/fluent-ffmpeg": "^2.1.24",
+    "@types/luxon": "^3.3.4",
     "@types/node": "^20.8.10",
     "bluebird": "^3.7.2",
     "debug": "^4.3.4",

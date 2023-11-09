@@ -11,6 +11,9 @@ dependencies:
   '@types/fluent-ffmpeg':
     specifier: ^2.1.24
     version: 2.1.24
+  '@types/luxon':
+    specifier: ^3.3.4
+    version: 3.3.4
   '@types/node':
     specifier: ^20.8.10
     version: 20.8.10
@@ -1716,6 +1719,10 @@ packages:
     dependencies:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
+
+  /@types/luxon@3.3.4:
+    resolution: {integrity: sha512-H9OXxv4EzJwE75aTPKpiGXJq+y4LFxjpsdgKwSmr503P5DkWc3AG7VAFYrFNVvqemT5DfgZJV9itYhqBHSGujA==}
+    dev: false
 
   /@types/node@20.8.10:
     resolution: {integrity: sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==}
