@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "outDir": "dist",
-        "allowJs": true,
+        "allowJs": false,
+        "strict": true,
         "target": "ES2020",
         "module": "NodeNext",
         "types": ["node"]

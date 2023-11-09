@@ -1,12 +1,20 @@
 import ffmpeg from 'fluent-ffmpeg';
 import { Duration } from 'luxon';
-// import Promise from 'bluebird';
 import os from 'os';
 import path from 'path';
 import debug$0 from 'debug';
-import execa from 'execa';
+import { execa } from 'execa';
 import fs from 'fs';
 import EventEmitter from 'events';
+
+interface IPrevvyProps {
+    input: string;
+    output: string;
+    cols: number;
+    rows: number;
+    width: number;
+    throttleTimeout?: number;
+}
 
 class Prevvy extends EventEmitter {
     private tmpDir: string;
@@ -27,7 +35,7 @@ class Prevvy extends EventEmitter {
         rows,
         width,
         throttleTimeout = 100,
-    }) {
+    }: IPrevvyProps) {
         super();
         this.tmpDir = os.tmpdir();
         this.input = input;
@@ -86,7 +94,7 @@ class Prevvy extends EventEmitter {
 
 
 
-    async getVideoDurationInSeconds(videoFilePath) {
+    async getVideoDurationInSeconds(videoFilePath: string) {
         if (!videoFilePath) throw new Error('videoFilePath passed to getVideoDurationInSeconds is undefined');
 
         // Check if the duration is cached
@@ -115,66 +123,64 @@ class Prevvy extends EventEmitter {
     
 
     async generate() {
-        try {
-            this.debug('Generate a unique ID based on the output filename')
-            const id = this.generateFrameId(this.output);
-            this.debug(`Generated ID: ${id}`);
+        this.debug('Generate a unique ID based on the output filename')
+        const id = this.generateFrameId(this.output);
+        this.debug(`Generated ID: ${id}`);
 
 
-            this.debug('Get the duration of the video')
-            const durationS = await this.getVideoDurationInSeconds(this.input);
-            this.debug(`Video duration: ${durationS} seconds`);
+        this.debug('Get the duration of the video')
+        const durationS = await this.getVideoDurationInSeconds(this.input);
+        this.debug(`Video duration: ${durationS} seconds`);
 
-            this.debug('Calculate the slice duration')
-            const msSlice = Math.floor((durationS * 1000) / this.tileCount);
-            this.debug(`Slice duration: ${msSlice} ms`);
+        this.debug('Calculate the slice duration')
+        const msSlice = Math.floor((durationS * 1000) / this.tileCount);
+        this.debug(`Slice duration: ${msSlice} ms`);
 
-            this.debug('Create frame data')
-            const frameData = Array.from({ length: this.tileCount }, (_, i) => {
-                // Calculate the timestamp for seeking
-                const timestamp = Duration.fromMillis(i * msSlice).toFormat('h:m:s');
-                const intermediateOutput = path.join(this.tmpDir, `${id}_${i}.png`);
-                return [timestamp, intermediateOutput];
-            });
+        this.debug('Create frame data')
+        const frameData = Array.from({ length: this.tileCount }, (_, i) => {
+            // Calculate the timestamp for seeking
+            const timestamp = Duration.fromMillis(i * msSlice).toFormat('h:m:s');
+            const intermediateOutput = path.join(this.tmpDir, `${id}_${i}.png`);
+            return [timestamp, intermediateOutput];
+        });
 
-            this.debug(frameData)
-            
-            const results = [];
-            for (const [index, data] of frameData.entries()) {
-                const x = Math.round((index / frameData.length) * 100); // Calculate the percentage
-                this.debug(`emitting progress percentage ${x} (${index}/${frameData.length})`);
-                this.emit('progress', { percentage: x });
+        this.debug(frameData)
+        
+        const results = [];
+        for (const [index, data] of frameData.entries()) {
+            if (!data) throw new Error(`frameData entry ${index} was lacking data.`);
+            if (!data[0]) throw new Error(`frameData entry data[0] was undefined`);
+            if (!data[1]) throw new Error(`frameData entry data[1] was undefined`);
+            const x = Math.round((index / frameData.length) * 100); // Calculate the percentage
+            this.debug(`Emitting progress percentage ${x} (${index}/${frameData.length})`);
+            this.emit('progress', { percentage: x });
 
-                const result = await this.ffmpegSeekP(data[0], data[1]);
-                results.push(result);
-            }
-
-
-
-            // Combining images together to make a tile
-            const inputFiles = frameData.map((data, i) => `${this.tmpDir}/${id}_${i}.png`);
-            const streams = Array.from({ length: this.tileCount }, (_, i) => `[${i}:v]`);
-            const layouts = Array.from({ length: this.tileCount }, (_, i) => this.makeLayout(i));
-
-            await this.ffmpegCombineP(inputFiles, streams, layouts);
-
-            return {
-                output: this.output,
-            };
-        } catch (error) {
-            this.debug(`Error: ${error.message}`);
-            throw error;
+            const result = await this.ffmpegSeekP(data[0], data[1]);
+            results.push(result);
         }
+
+
+
+        // Combining images together to make a tile
+        const inputFiles = frameData.map((data, i) => `${this.tmpDir}/${id}_${i}.png`);
+        const streams = Array.from({ length: this.tileCount }, (_, i) => `[${i}:v]`);
+        const layouts = Array.from({ length: this.tileCount }, (_, i) => this.makeLayout(i));
+
+        await this.ffmpegCombineP(inputFiles, streams, layouts);
+
+        return {
+            output: this.output,
+        };
     }
 
 
-    generateFrameId(outputFilename) {
+    generateFrameId(outputFilename: string) {
         // Generate a unique ID based on the output filename
         const id = path.basename(outputFilename, path.extname(outputFilename));
         return id;
     }
 
-    makeLayout(i) {
+    makeLayout(i: number) {
         // see https://ffmpeg.org/ffmpeg-filters.html#xstack for the madness
         const currentColumn = i % this.cols;
         const currentRow = Math.floor(i / this.cols);
@@ -209,7 +215,7 @@ class Prevvy extends EventEmitter {
      * @param {*} layouts 
      * @returns 
      */
-    async ffmpegCombineP(inputFiles, streams, layouts): Promise<void> {
+    async ffmpegCombineP(inputFiles: string[], streams: string[], layouts: string[]): Promise<void> {
         return new Promise((resolve, reject) => {
             const command = ffmpeg();
 
