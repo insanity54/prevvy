@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import Prevvy from './index.js';
+import Prevvy from './src/index.js';
 
 const MAX_RETRIES = 3;
 

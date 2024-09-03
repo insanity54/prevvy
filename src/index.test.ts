@@ -1,19 +1,19 @@
-import { describe, before, beforeEach, it } from 'mocha';
+import { describe, beforeAll, beforeEach, test } from 'vitest';
 import { expect } from 'chai';
-import Prevvy, { IPrevvyOptions } from '../index.js';
+import Prevvy, { IPrevvyOptions } from './index.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const testVideoPath = path.join(__dirname, 'video.mp4');
-const testImageDir = __dirname;
-const testImage3x3Path = path.join(__dirname, 'testImage3x3.png');
-const testImage6x3Path = path.join(__dirname, 'testImage6x3.png');
-const movieUrl = 'https://ipfs.io/ipfs/QmQWM1qDPasxm5sXAQeVMfmhnECBzyYkLgfK23yPif1Ftx';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const testVideoPath = path.join(__dirname, 'fixtures', 'video.mp4');
+const testImageDir = __dirname;
+const testImage3x3Path = path.join(__dirname, 'fixtures', 'testImage3x3.png');
+const testImage6x3Path = path.join(__dirname, 'fixtures', 'testImage6x3.png');
+const movieUrl = 'https://ipfs.io/ipfs/QmQWM1qDPasxm5sXAQeVMfmhnECBzyYkLgfK23yPif1Ftx';
 
 const opts = (id: string): IPrevvyOptions => {
   return {
@@ -38,15 +38,15 @@ const assertTestVideoExistence = (): Promise<void> => {
 };
 
 describe('prevvy', () => {
-  before(async () => {
+  beforeAll(async () => {
     await assertTestVideoExistence();
   });
 
 
 
   describe('generate', function() {
-    this.timeout(120000);
-    it('http input source', async () => {
+    
+    test('http input source', async () => {
       const options: IPrevvyOptions = {
         input: movieUrl,
         output: path.join(os.tmpdir(), 'test.png'),
@@ -57,9 +57,9 @@ describe('prevvy', () => {
       };
       let p = new Prevvy(options);
       await p.generate();
-    })
+    }, 120000)
 
-    it('should cope with a video with spaces and special characters in its name', () => {
+    test('should cope with a video with spaces and special characters in its name', () => {
       const options: IPrevvyOptions = {
         input: path.join(__dirname, 'test vid (spaces).mp4'),
         output: path.join(__dirname, 'spacesOutput.png'),
@@ -69,7 +69,7 @@ describe('prevvy', () => {
       };
     });
 
-    it('should make a 3x3 preview image', async () => {
+    test('should make a 3x3 preview image', async () => {
       const options: IPrevvyOptions = {
         input: testVideoPath,
         output: testImage3x3Path,
@@ -81,7 +81,7 @@ describe('prevvy', () => {
       await p.generate();
     });
 
-    it('should make a 6x3 preview image', async () => {
+    test('should make a 6x3 preview image', async () => {
       const options: IPrevvyOptions = {
         input: testVideoPath,
         output: testImage6x3Path,
@@ -101,39 +101,39 @@ describe('prevvy', () => {
       p = new Prevvy(opts('layout'));
     });
 
-    it('3x3 grid i 0', () => {
+    test('3x3 grid i 0', () => {
       expect(p.makeLayout(0)).to.equal('0_0');
     });
 
-    it('3x3 grid i 1', () => {
+    test('3x3 grid i 1', () => {
       expect(p.makeLayout(1)).to.equal('w0_0');
     });
 
-    it('3x3 grid i 2', () => {
+    test('3x3 grid i 2', () => {
       expect(p.makeLayout(2)).to.equal('w0+w0_0');
     });
 
-    it('3x3 grid i 3', () => {
+    test('3x3 grid i 3', () => {
       expect(p.makeLayout(3)).to.equal('0_h0');
     });
 
-    it('3x3 grid i 4', () => {
+    test('3x3 grid i 4', () => {
       expect(p.makeLayout(4)).to.equal('w0_h0');
     });
 
-    it('3x3 grid i 5', () => {
+    test('3x3 grid i 5', () => {
       expect(p.makeLayout(5)).to.equal('w0+w0_h0');
     });
 
-    it('3x3 grid i 6', () => {
+    test('3x3 grid i 6', () => {
       expect(p.makeLayout(6)).to.equal('0_h0+h0');
     });
 
-    it('3x3 grid i 7', () => {
+    test('3x3 grid i 7', () => {
       expect(p.makeLayout(7)).to.equal('w0_h0+h0');
     });
 
-    it('3x3 grid i 8', () => {
+    test('3x3 grid i 8', () => {
       expect(p.makeLayout(8)).to.equal('w0+w0_h0+h0');
     });
   });
