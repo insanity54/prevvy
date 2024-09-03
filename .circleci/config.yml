@@ -10,7 +10,7 @@ aliases:
 jobs:
   run_tests:
     docker:
-      - image: node:18
+      - image: node:20
     steps:
       - checkout
       - *restore_cache
@@ -18,7 +18,7 @@ jobs:
           name: Install pnpm
           command: |
             corepack enable
-            corepack prepare pnpm@latest-8 --activate
+            corepack prepare pnpm@latest-9 --activate
       - run:
           name: Install Dependencies
           command: pnpm install

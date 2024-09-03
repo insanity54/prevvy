@@ -13,3 +13,7 @@ several breaking changes
 * moved source files to ./src
 * moved tests to ./src
 * added build artifacts to npm package
+
+## 8.0.1
+
+* increased test timeout to 6 seconds

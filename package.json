@@ -1,6 +1,6 @@
 {
   "name": "prevvy",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Create a tiled video preview image using ffmpeg... FAST!",
   "main": "./dist/index.js",
   "types": "./dist/index.d.js",

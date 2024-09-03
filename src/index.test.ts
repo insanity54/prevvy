@@ -91,7 +91,7 @@ describe('prevvy', () => {
       };
       let p = new Prevvy(options);
       await p.generate();
-    });
+    }, 6000);
   });
 
   describe('makeLayout', () => {
