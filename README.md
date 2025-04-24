@@ -1,5 +1,13 @@
 # prevvy
 
+**DEPRECATED**
+https://github.com/amietn/vcsi
+**DEPRECATED**
+
+**DEPRECATED**
+
+**Don't use this. It's really slow. use https://github.com/amietn/vcsi instead**
+
 [![insanity54](https://circleci.com/gh/insanity54/prevvy.svg?style=svg)](https://app.circleci.com/pipelines/github/insanity54/prevvy)
 
 
