@@ -1,7 +1,7 @@
 # prevvy
 
 **DEPRECATED**
-https://github.com/amietn/vcsi
+
 **DEPRECATED**
 
 **DEPRECATED**
