@@ -6,7 +6,7 @@
 
 **DEPRECATED**
 
-**Don't use this. It's really slow. use https://github.com/amietn/vcsi instead**
+**Don't use this. It's really slow. use https://github.com/insanity54/slvtt or https://github.com/amietn/vcsi instead**
 
 [![insanity54](https://circleci.com/gh/insanity54/prevvy.svg?style=svg)](https://app.circleci.com/pipelines/github/insanity54/prevvy)
 
